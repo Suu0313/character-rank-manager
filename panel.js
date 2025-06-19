@@ -44,7 +44,8 @@ async function fetchCharacterList() {
         <input type="checkbox" class="char-select" data-rank="${rank}">
         <img src="${imgSrc}" width="50">
         <span>${name} (RANK: ${rank})</span>
-        <input type="number" class="rank-input" placeholder="カスタムRANK" min="${rank}" max="999999" value="">
+        <input type="number" class="rank-input" placeholder="カスタムRANK" min="${rank}" max="200" value="">
+        <div class="required-exp"></div>
       `;
       characterList.appendChild(charDiv);
     });    // チェックボックスの変更イベントを監視
@@ -115,25 +116,107 @@ function toggleSelectedOnly() {
 function updateTotalRank() {
   const selectedCharacters = Array.from(document.querySelectorAll('.char-select:checked'))
     .map(checkbox => {
-      const charDiv = checkbox.closest('.character'); const originalRank = Number(checkbox.dataset.rank);
+      const charDiv = checkbox.closest('.character');
+      const originalRank = Number(checkbox.dataset.rank);
       const customValue = charDiv.querySelector('.rank-input').value;
       const customRank = customValue ? Number(customValue) : originalRank;
+      const { exp, statue, rainbow } = calculateRequiredExp(originalRank, customRank);
+
+      // 必要経験値表示の更新
+      const expDisplay = charDiv.querySelector('.required-exp');
+      if (expDisplay) {
+        expDisplay.textContent = customValue ? `必要経験値: ${exp.toLocaleString()}` : '';
+      }
+
       return {
         originalRank,
-        customRank
+        customRank,
+        requiredExp: exp
       };
     });
-
   const originalTotal = selectedCharacters.reduce((sum, char) => sum + char.originalRank, 0);
   const customTotal = selectedCharacters.reduce((sum, char) => sum + char.customRank, 0);
+  const totalRequiredExp = selectedCharacters.reduce((sum, char) => sum + char.requiredExp, 0);
 
+  // 合計情報を表示
   document.getElementById('originalTotalRank').innerHTML = `<h3>オリジナル合計 RANK: ${originalTotal}</h3>`;
   document.getElementById('customTotalRank').innerHTML = `<h3>カスタム合計 RANK: ${customTotal}</h3>`;
+  document.getElementById('totalRequiredExp').innerHTML = `<h3>必要経験値合計: ${totalRequiredExp.toLocaleString()}</h3>`;
 
   // 選択状態に応じてスタイルを更新
   document.querySelectorAll('.character').forEach(charDiv => {
     charDiv.classList.toggle('selected', charDiv.querySelector('.char-select').checked);
   });
+}
+
+// ランク間の必要経験値を計算する関数
+function calculateRequiredExp(currentRank, targetRank) {
+
+  const expTable = [
+    { exp: 2, statue: 0, rainbow: 0 }, // RANK ~ 5
+    { exp: 2, statue: 0, rainbow: 0 }, // RANK ~ 10
+    { exp: 10, statue: 0, rainbow: 0 }, // RANK ~ 15
+    { exp: 15, statue: 1, rainbow: 0 }, // RANK ~ 20
+    { exp: 20, statue: 1, rainbow: 0 }, // RANK ~ 25
+    { exp: 30, statue: 2, rainbow: 0 }, // RANK ~ 30
+    { exp: 40, statue: 2, rainbow: 0 }, // RANK ~ 35
+    { exp: 50, statue: 2, rainbow: 0 }, // RANK ~ 40
+    { exp: 60, statue: 2, rainbow: 0 }, // RANK ~ 45
+    { exp: 70, statue: 2, rainbow: 0 }, // RANK ~ 50
+    { exp: 90, statue: 0, rainbow: 1 }, // RANK ~ 55
+    { exp: 110, statue: 3, rainbow: 0 }, // RANK ~ 60
+    { exp: 130, statue: 3, rainbow: 0 }, // RANK ~ 65
+    { exp: 150, statue: 3, rainbow: 0 }, // RANK ~ 70
+    { exp: 170, statue: 3, rainbow: 0 }, // RANK ~ 75
+    { exp: 190, statue: 4, rainbow: 0 }, // RANK ~ 80
+    { exp: 210, statue: 4, rainbow: 0 }, // RANK ~ 85
+    { exp: 230, statue: 4, rainbow: 0 }, // RANK ~ 90
+    { exp: 250, statue: 4, rainbow: 0 }, // RANK ~ 95
+    { exp: 270, statue: 4, rainbow: 0 }, // RANK ~ 100
+    { exp: 300, statue: 0, rainbow: 1 }, // RANK ~ 105
+    { exp: 330, statue: 5, rainbow: 0 }, // RANK ~ 110
+    { exp: 360, statue: 5, rainbow: 0 }, // RANK ~ 115
+    { exp: 390, statue: 5, rainbow: 0 }, // RANK ~ 120
+    { exp: 420, statue: 5, rainbow: 0 }, // RANK ~ 125
+    { exp: 450, statue: 6, rainbow: 0 }, // RANK ~ 130
+    { exp: 480, statue: 6, rainbow: 0 }, // RANK ~ 135
+    { exp: 510, statue: 6, rainbow: 0 }, // RANK ~ 140
+    { exp: 540, statue: 6, rainbow: 0 }, // RANK ~ 145
+    { exp: 570, statue: 6, rainbow: 0 }, // RANK ~ 150
+    { exp: 610, statue: 0, rainbow: 2 }, // RANK ~ 155
+    { exp: 650, statue: 7, rainbow: 0 }, // RANK ~ 160
+    { exp: 690, statue: 7, rainbow: 0 }, // RANK ~ 165
+    { exp: 730, statue: 7, rainbow: 0 }, // RANK ~ 170
+    { exp: 770, statue: 7, rainbow: 0 }, // RANK ~ 175
+    { exp: 810, statue: 8, rainbow: 0 }, // RANK ~ 180
+    { exp: 850, statue: 8, rainbow: 0 }, // RANK ~ 185
+    { exp: 890, statue: 8, rainbow: 0 }, // RANK ~ 190
+    { exp: 930, statue: 8, rainbow: 0 }, // RANK ~ 195
+    { exp: 970, statue: 8, rainbow: 0 } // RANK ~ 200 (MAX)
+  ];
+
+  let exp = 0, statue = 0, rainbow = 0;
+
+  if (currentRank >= targetRank) return { exp, statue, rainbow };
+
+  for (let index = 0; index < expTable.length; index++) {
+    const minRank = index * 5, maxRank = minRank + 4;
+    if (maxRank <= currentRank) continue;
+    if (targetRank <= minRank) break;
+
+    statue += expTable[index].statue;
+    rainbow += expTable[index].rainbow;
+
+    if (targetRank <= maxRank) {
+      exp += expTable[index].exp * (targetRank - currentRank);
+    } else {
+      exp += expTable[index].exp * (maxRank - currentRank + 1);
+    }
+
+    currentRank = maxRank + 1;
+  }
+
+  return { exp, statue, rainbow };
 }
 
 // 実行
