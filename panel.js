@@ -125,23 +125,37 @@ function updateTotalRank() {
       // 必要経験値表示の更新
       const expDisplay = charDiv.querySelector('.required-exp');
       if (expDisplay) {
-        expDisplay.textContent = customValue ? `必要経験値: ${exp.toLocaleString()}` : '';
+        if (customValue) {
+          expDisplay.textContent = `必要経験値: ${exp.toLocaleString()}
+スタチュー: ${statue.toLocaleString()}個
+虹スタチュー: ${rainbow.toLocaleString()}個`;
+        } else {
+          expDisplay.textContent = '';
+        }
       }
 
       return {
         originalRank,
         customRank,
-        requiredExp: exp
+        requiredExp: exp,
+        requiredStatue: statue,
+        requiredRainbow: rainbow
       };
     });
   const originalTotal = selectedCharacters.reduce((sum, char) => sum + char.originalRank, 0);
   const customTotal = selectedCharacters.reduce((sum, char) => sum + char.customRank, 0);
   const totalRequiredExp = selectedCharacters.reduce((sum, char) => sum + char.requiredExp, 0);
+  const totalRequiredStatue = selectedCharacters.reduce((sum, char) => sum + char.requiredStatue, 0);
+  const totalRequiredRainbow = selectedCharacters.reduce((sum, char) => sum + char.requiredRainbow, 0);
 
   // 合計情報を表示
   document.getElementById('originalTotalRank').innerHTML = `<h3>オリジナル合計 RANK: ${originalTotal}</h3>`;
   document.getElementById('customTotalRank').innerHTML = `<h3>カスタム合計 RANK: ${customTotal}</h3>`;
-  document.getElementById('totalRequiredExp').innerHTML = `<h3>必要経験値合計: ${totalRequiredExp.toLocaleString()}</h3>`;
+  document.getElementById('totalRequiredExp').innerHTML = `
+    <h3>必要経験値合計: ${totalRequiredExp.toLocaleString()}</h3>
+    <h3>必要スタチュー合計: ${totalRequiredStatue.toLocaleString()}個</h3>
+    <h3>必要虹スタチュー合計: ${totalRequiredRainbow.toLocaleString()}個</h3>
+  `;
 
   // 選択状態に応じてスタイルを更新
   document.querySelectorAll('.character').forEach(charDiv => {
@@ -204,8 +218,11 @@ function calculateRequiredExp(currentRank, targetRank) {
     if (maxRank <= currentRank) continue;
     if (targetRank <= minRank) break;
 
-    statue += expTable[index].statue;
-    rainbow += expTable[index].rainbow;
+    if (currentRank === minRank) {
+      // 最小ランクの時だけ限界突破
+      statue += expTable[index].statue;
+      rainbow += expTable[index].rainbow;
+    }
 
     if (targetRank <= maxRank) {
       exp += expTable[index].exp * (targetRank - currentRank);
