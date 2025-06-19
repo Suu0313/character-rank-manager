@@ -1,0 +1,19 @@
+{
+  "manifest_version": 3,
+  "name": "イロドリミドリ ランクリスト",
+  "version": "1.0",
+  "description": "イロドリミドリランク一覧を取得して表示します。",
+  "permissions": ["sidePanel", "activeTab", "scripting"],
+  "host_permissions": [
+    "https://new.chunithm-net.com/*"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "side_panel": {
+    "default_path": "panel.html"
+  },
+  "action": {
+    "default_title": "Click to open panel"
+  }
+}
