@@ -1,5 +1,6 @@
 async function fetchCharacterList() {
   const url = "https://new.chunithm-net.com/chuni-mobile/html/mobile/collection/characterList/";
+  // const url = "./sample.html";
   const irodorimidoriId = "ipId14"; // イロドリミドリのID
 
   try {
@@ -231,7 +232,7 @@ function calculateRequiredExp(currentRank, targetRank) {
 
   for (let index = 0; index < expTable.length; index++) {
     const minRank = index * 5, maxRank = minRank + 4;
-    if (maxRank <= currentRank) continue;
+    if (maxRank < currentRank) continue;
     if (targetRank <= minRank) break;
 
     if (currentRank === minRank) {
