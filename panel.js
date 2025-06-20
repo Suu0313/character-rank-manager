@@ -48,12 +48,18 @@ async function fetchCharacterList() {
         <div class="required-exp"></div>
       `;
       characterList.appendChild(charDiv);
-    });    // チェックボックスの変更イベントを監視
+    });
+
+    // チェックボックスの変更イベントを監視
     document.querySelectorAll('.char-select').forEach(checkbox => {
       checkbox.addEventListener('change', () => {
         updateTotalRank();
         if (showSelectedOnly) filterCharacters();
-      }); checkbox.closest('.character').addEventListener('click', (e) => {
+      });
+
+      checkbox.closest('.character').addEventListener('click', (e) => {
+        if (lockSelection) return; // 選択固定中はクリックイベントを無視
+
         // number型のinputをクリックした場合は、チェックボックスの状態を変更しない
         if (e.target.type !== 'checkbox' && e.target.type !== 'number') {
           checkbox.checked = !checkbox.checked;
@@ -61,7 +67,9 @@ async function fetchCharacterList() {
           if (showSelectedOnly) filterCharacters();
         }
       });
-    });    // フィルター入力欄のイベントを監視
+    });
+
+    // フィルター入力欄のイベントを監視
     const nameFilter = document.getElementById('nameFilter');
     nameFilter.addEventListener('input', filterCharacters);
 
@@ -69,15 +77,14 @@ async function fetchCharacterList() {
     const showSelectedButton = document.getElementById('showSelectedOnly');
     showSelectedButton.addEventListener('click', toggleSelectedOnly);
 
+    // 選択固定ボタンのイベントを監視
+    const lockSelectionButton = document.getElementById('lockSelection');
+    lockSelectionButton.addEventListener('click', toggleLockSelection);
+
     // RANK入力欄のイベントを監視
     document.querySelectorAll('.rank-input').forEach(input => {
       input.addEventListener('input', updateTotalRank);
     });
-
-
-    // const test = document.createElement("div");
-    // test.textContent = htmlText;
-    // characterList.append(test); 
 
   } catch (error) {
     console.error("データ取得エラー:", error);
@@ -87,6 +94,9 @@ async function fetchCharacterList() {
 
 // フィルタリング状態を管理する変数
 let showSelectedOnly = false;
+
+// 選択状態を固定するための変数
+let lockSelection = false;
 
 // キャラクターをフィルタリングする関数
 function filterCharacters() {
@@ -112,6 +122,12 @@ function toggleSelectedOnly() {
   filterCharacters();
 }
 
+function toggleLockSelection() {
+  const button = document.getElementById('lockSelection');
+  lockSelection = !lockSelection;
+  button.classList.toggle('active', lockSelection);
+}
+
 // 選択されたキャラクターの合計RANKを計算して表示
 function updateTotalRank() {
   const selectedCharacters = Array.from(document.querySelectorAll('.char-select:checked'))
@@ -127,8 +143,8 @@ function updateTotalRank() {
       if (expDisplay) {
         if (customValue) {
           expDisplay.textContent = `必要経験値: ${exp.toLocaleString()}
-スタチュー: ${statue.toLocaleString()}個
-虹スタチュー: ${rainbow.toLocaleString()}個`;
+スタチュウ: ${statue.toLocaleString()}個
+虹スタチュウ: ${rainbow.toLocaleString()}個`;
         } else {
           expDisplay.textContent = '';
         }
@@ -153,8 +169,8 @@ function updateTotalRank() {
   document.getElementById('customTotalRank').innerHTML = `<h3>カスタム合計 RANK: ${customTotal}</h3>`;
   document.getElementById('totalRequiredExp').innerHTML = `
     <h3>必要経験値合計: ${totalRequiredExp.toLocaleString()}</h3>
-    <h3>必要スタチュー合計: ${totalRequiredStatue.toLocaleString()}個</h3>
-    <h3>必要虹スタチュー合計: ${totalRequiredRainbow.toLocaleString()}個</h3>
+    <h3>必要スタチュウ合計: ${totalRequiredStatue.toLocaleString()}個</h3>
+    <h3>必要虹スタチュウ合計: ${totalRequiredRainbow.toLocaleString()}個</h3>
   `;
 
   // 選択状態に応じてスタイルを更新
