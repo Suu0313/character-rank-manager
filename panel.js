@@ -28,8 +28,12 @@ async function fetchCharacterList() {
     nameElements.forEach((nameEl, index) => {
 
       const name = nameEl.textContent.trim();
-      const characterDiv = characterDivs[index];
-      if (characterDiv.getAttribute('name') != irodorimidoriId) return;
+      const characterDiv = characterDivs[index].getAttribute('name') ?? '';
+
+      // イロドリミドリのキャラクターのみを対象
+      // jQuery の $('div[name|="ipId' + idx + '"]') は 「完全一致 または - 区切りで前方一致」
+      if ((characterDiv != irodorimidoriId) && !(characterDiv.startsWith(irodorimidoriId + '-')))
+        return;
 
       const imgSrc = imageElements[index + 1]?.getAttribute("data-original") || "no_image.png";
 
