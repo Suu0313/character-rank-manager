@@ -62,16 +62,16 @@ async function fetchCharacterList() {
         if (showSelectedOnly) filterCharacters();
       });
 
-      checkbox.closest('.character').addEventListener('click', (e) => {
-        if (lockSelection) return; // 選択固定中はクリックイベントを無視
+      // checkbox.closest('.character').addEventListener('click', (e) => {
+      //   if (lockSelection) return; // 選択固定中はクリックイベントを無視
 
-        // number型のinputをクリックした場合は、チェックボックスの状態を変更しない
-        if (e.target.type !== 'checkbox' && e.target.type !== 'number') {
-          checkbox.checked = !checkbox.checked;
-          updateTotalRank();
-          if (showSelectedOnly) filterCharacters();
-        }
-      });
+      //   // number型のinputをクリックした場合は、チェックボックスの状態を変更しない
+      //   if (e.target.type !== 'checkbox' && e.target.type !== 'number') {
+      //     checkbox.checked = !checkbox.checked;
+      //     updateTotalRank();
+      //     if (showSelectedOnly) filterCharacters();
+      //   }
+      // });
     });
 
     // フィルター入力欄のイベントを監視
@@ -256,6 +256,47 @@ function calculateRequiredExp(currentRank, targetRank) {
 
   return { exp, statue, rainbow };
 }
+
+// --- ドラッグ選択用 ---
+let isDragging = false;
+let lastCheckedState = false;
+
+const characterList = document.getElementById("characterList");
+if (characterList) {
+  characterList.addEventListener('mousedown', (e) => {
+    if (e.target.type === 'checkbox' || e.target.type === 'number') return;
+    if (lockSelection) return;
+    const checkbox = e.target.closest('.character')?.querySelector('.char-select');
+    if (checkbox) {
+      lastCheckedState = !checkbox.checked;
+      checkbox.checked = lastCheckedState;
+      updateTotalRank();
+      if (showSelectedOnly) filterCharacters();
+
+      if (e.ctrlKey) {
+        isDragging = true;
+        document.body.classList.add('no-select');
+      }
+    }
+  });
+}
+
+document.addEventListener('mousemove', (e) => {
+  if (!isDragging) return;
+  if (lockSelection) return;
+  const character = e.target.closest('.character');
+  if (character) {
+    const checkbox = character.querySelector('.char-select');
+    if (checkbox && checkbox.checked !== lastCheckedState) {
+      checkbox.checked = lastCheckedState;
+      updateTotalRank();
+      if (showSelectedOnly) filterCharacters();
+    }
+  }
+});
+document.addEventListener('mouseup', () => { isDragging = false; document.body.classList.remove('no-select'); });
+document.addEventListener('mouseleave', () => { isDragging = false; document.body.classList.remove('no-select'); });
+
 
 // 実行
 fetchCharacterList();
