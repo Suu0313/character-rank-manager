@@ -12,9 +12,26 @@
   <button id="openReference" class="exp-table-button" style="margin-bottom: 1em;">参考情報</button>
   <h2>イロドリミドリ ランクリスト</h2>
   <div class="filter-container">
-    <input type="text" id="nameFilter" placeholder="キャラクター名で検索..." class="name-filter">
+    <input type="text" id="nameFilter" list="characterNameList" placeholder="キャラクター名で検索..." class="name-filter">
+    <datalist id="characterNameList">
+      <option value="明坂 芹菜">
+      <option value="御形 アリシアナ">
+      <option value="天王洲 なずな">
+      <option value="小仏 凪">
+      <option value="箱部 なる">
+      <option value="月鈴 那知">
+      <option value="月鈴 白奈">
+      <option value="五十嵐 撫子">
+      <option value="萩原 七々瀬">
+      <option value="葛城 華">
+      <option value="小野 美苗">
+      <option value="藤堂 陽南袴">
+      <option value="桔梗 小夜曲">
+      <option value="芒崎 奏">
+    </datalist>
     <button id="showSelectedOnly" class="filter-button">選択中のみを表示</button>
     <button id="lockSelection" class="lock-selection-button">選択を固定</button>
+    <button id="clearSelection" class="filter-button">全解除</button>
   </div>
   <div id="rankSummary">
     <div id="originalTotalRank">
