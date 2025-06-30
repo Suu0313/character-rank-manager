@@ -80,6 +80,10 @@ async function fetchCharacterList() {
     const lockSelectionButton = document.getElementById('lockSelection');
     lockSelectionButton.addEventListener('click', toggleLockSelection);
 
+    // 全解除ボタンのイベントを監視
+    const clearSelectionButton = document.getElementById('clearSelection');
+    clearSelectionButton.addEventListener('click', clearAllSelection);
+
     // RANK入力欄のイベントを監視
     document.querySelectorAll('.rank-input').forEach(input => {
       input.addEventListener('input', function () {
@@ -121,6 +125,8 @@ function toggleSelectedOnly() {
   const button = document.getElementById('showSelectedOnly');
   showSelectedOnly = !showSelectedOnly;
   button.classList.toggle('active', showSelectedOnly);
+  // ボタン文言をトグル
+  button.textContent = showSelectedOnly ? '全キャラを表示' : '選択中のみを表示';
   filterCharacters();
 }
 
@@ -128,6 +134,18 @@ function toggleLockSelection() {
   const button = document.getElementById('lockSelection');
   lockSelection = !lockSelection;
   button.classList.toggle('active', lockSelection);
+  // ボタン文言をトグル
+  button.textContent = lockSelection ? '選択固定解除' : '選択を固定';
+}
+
+// 全解除ボタンの処理
+function clearAllSelection() {
+  if (lockSelection) return;
+  document.querySelectorAll('.char-select:checked').forEach(cb => {
+    cb.checked = false;
+  });
+  updateTotalRank();
+  if (showSelectedOnly) filterCharacters();
 }
 
 // 個別キャラの必要経験値表示を更新
