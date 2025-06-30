@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "イロドリミドリ ランクリスト",
-  "version": "1.0",
+  "version": "1.0.0",
   "description": "イロドリミドリランク一覧を取得して表示します。",
   "permissions": ["sidePanel", "activeTab", "scripting"],
   "host_permissions": [
