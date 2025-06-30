@@ -19,30 +19,22 @@ async function fetchCharacterList() {
     const characterList = document.getElementById("characterList");
     characterList.innerHTML = ""; // クリア
 
-    const nameElements = doc.querySelectorAll(".character_name_block a");
-    const imageElements = doc.querySelectorAll(".list_chara_img img");
-    const rankElements = doc.querySelectorAll(".character_list_rank_num_block");
-    const characterDivs = doc.querySelectorAll('div[name^="ipId"]');
+    // イロドリミドリのキャラクターを含む div 要素を取得 (140 みたいなのが出たらだるいが後の処理ではじく)
+    const characterDivs = doc.querySelectorAll(`div.box01[name^="${irodorimidoriId}"]`);
 
-    // キャラクターごとに処理
-    nameElements.forEach((nameEl, index) => {
-
-      const name = nameEl.textContent.trim();
-      const characterDiv = characterDivs[index].getAttribute('name') ?? '';
-
+    characterDivs.forEach(characterDiv => {
+      const name = characterDiv.querySelector('.character_name_block a')?.textContent.trim() ?? '';
+      const charaId = characterDiv.getAttribute('name') ?? '';
       // イロドリミドリのキャラクターのみを対象
-      // jQuery の $('div[name|="ipId' + idx + '"]') は 「完全一致 または - 区切りで前方一致」
-      if ((characterDiv != irodorimidoriId) && !(characterDiv.startsWith(irodorimidoriId + '-')))
+      if ((charaId != irodorimidoriId) && !(charaId.startsWith(irodorimidoriId + '-')))
         return;
-
-      const imgSrc = imageElements[index + 1]?.getAttribute("data-original") || "no_image.png";
-
-      // 🏆 ランク取得処理 🏆
-      let rankImgs = rankElements[index + 1]?.querySelectorAll("img") || [];
+      const imgSrc = characterDiv.querySelector('.list_chara_img img')?.getAttribute('data-original') || 'no_image.png';
+      // ランク取得
+      let rankImgs = characterDiv.querySelectorAll('.character_list_rank_num_block img') || [];
       let rank = Array.from(rankImgs)
         .map(img => img.src.match(/num_s_lv_(\d)\.png/)?.[1] || "")
-        .join(""); // 画像名の数字を結合してランクにする      // HTML に追加   
-
+        .join("");
+      // HTML に追加
       const charDiv = document.createElement("div");
       charDiv.className = "character";
       charDiv.innerHTML = `
@@ -297,6 +289,9 @@ document.addEventListener('mousemove', (e) => {
 document.addEventListener('mouseup', () => { isDragging = false; document.body.classList.remove('no-select'); });
 document.addEventListener('mouseleave', () => { isDragging = false; document.body.classList.remove('no-select'); });
 
+document.getElementById('openExpTable').addEventListener('click', function () {
+  window.open('exp_table.html', '_blank');
+});
 
 // 実行
 fetchCharacterList();
