@@ -106,9 +106,9 @@ let lockSelection = false;
 
 // キャラクターをフィルタリングする関数
 function filterCharacters() {
-  const filterText = document.getElementById('nameFilter').value.toLowerCase();
+  const filterText = document.getElementById('nameFilter').value.toLowerCase().replace(/\s/g, '');
   document.querySelectorAll('.character').forEach(charDiv => {
-    const name = charDiv.querySelector('span').textContent.toLowerCase();
+    const name = charDiv.querySelector('span').textContent.toLowerCase().replace(/\s/g, '');
     const matchesText = name.includes(filterText);
     const isSelected = charDiv.querySelector('.char-select').checked;
 
